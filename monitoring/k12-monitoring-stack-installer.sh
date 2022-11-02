@@ -8,16 +8,16 @@ chmod 700 get_helm.sh
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-export PROJECT_ID=_PROJECT_ID_KEY
-export REGION=_REGION_ID_KEY
+export PROJECT_ID=$1
+export REGION=$2
 
 gcloud config set project ${PROJECT_ID?}
-gcloud container clusters get-credentials broker-${REGION?} --region ${REGION?}
+gcloud container clusters get-credentials labs-${REGION?} --region ${REGION?}
 
 kubectl create ns monitoring
 
 helm install kube-prom-stack prometheus-community/kube-prometheus-stack -n monitoring
 
 # For Access to Grafana WebUI
-# POD=$(kubectl get pod -n monitoring -l app.kubernetes.io/name=grafana -o jsonpath='{..metadata.name}' | head -1)
-# echo "Execute in your localhost: kubectl port-forward --address 0.0.0.0 ${POD} -n monitoring 3000:3000"
+POD=$(kubectl get pod -n monitoring -l app.kubernetes.io/name=grafana -o jsonpath='{..metadata.name}' | head -1)
+echo "Execute in your localhost: kubectl port-forward --address 0.0.0.0 ${POD} -n monitoring 3000:3000"
